@@ -17,14 +17,19 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:performance": "jest --testPathPattern=performance.spec.ts",
+    "test:unit": "jest --testPathPattern=bookboost.service.spec.ts",
+    "test:all": "npm run test:unit && npm run test:performance && npm run test:e2e"
   },
   "dependencies": {
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "axios": "^1.10.0",
     "bookboost-middleware": "link:",
+    "dotenv": "^17.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -70,6 +75,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/modules/bookboost/test-setup.ts"
+    ]
   }
 }

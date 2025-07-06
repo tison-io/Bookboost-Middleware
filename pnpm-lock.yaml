@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@nestjs/axios':
+    specifier: ^4.0.0
+    version: 4.0.0(@nestjs/common@11.1.3)(axios@1.10.0)(rxjs@7.8.2)
   '@nestjs/common':
     specifier: ^11.0.1
     version: 11.1.3(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -20,6 +23,9 @@ dependencies:
   bookboost-middleware:
     specifier: 'link:'
     version: 'link:'
+  dotenv:
+    specifier: ^17.0.1
+    version: 17.0.1
   reflect-metadata:
     specifier: ^0.2.2
     version: 0.2.2
@@ -1328,6 +1334,18 @@ packages:
       '@napi-rs/nice-win32-x64-msvc': 1.0.2
     dev: true
     optional: true
+
+  /@nestjs/axios@4.0.0(@nestjs/common@11.1.3)(axios@1.10.0)(rxjs@7.8.2):
+    resolution: {integrity: sha512-1cB+Jyltu/uUPNQrpUimRHEQHrnQrpLzVj6dU3dgn6iDDDdahr10TgHFGTmw5VuJ9GzKZsCLDL78VSwJAs/9JQ==}
+    peerDependencies:
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      axios: ^1.3.1
+      rxjs: ^7.0.0
+    dependencies:
+      '@nestjs/common': 11.1.3(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      axios: 1.10.0
+      rxjs: 7.8.2
+    dev: false
 
   /@nestjs/cli@11.0.7(@swc/cli@0.6.0)(@swc/core@1.12.9)(@types/node@22.16.0):
     resolution: {integrity: sha512-svrP8j1R0/lQVJ8ZI3BlDtuZxmkvVJokUJSB04sr6uibunk2wHeVDDVLZvYBUorCdGU/RHJl1IufhqUBM91vAQ==}
@@ -3032,6 +3050,11 @@ packages:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
     engines: {node: '>=0.3.1'}
     dev: true
+
+  /dotenv@17.0.1:
+    resolution: {integrity: sha512-GLjkduuAL7IMJg/ZnOPm9AnWKJ82mSE2tzXLaJ/6hD6DhwGfZaXG77oB8qbReyiczNxnbxQKyh0OE5mXq0bAHA==}
+    engines: {node: '>=12'}
+    dev: false
 
   /dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
