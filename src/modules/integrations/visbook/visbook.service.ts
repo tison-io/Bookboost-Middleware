@@ -37,8 +37,10 @@ export class VisbookService {
       );
       return response.data;
     } catch (error) {
-      console.error(`Visbook API request failed: ${error.message}`);
-      throw new Error(`Visbook API request failed: ${error.message}`);
+      console.error(`Visbook API request failed: ${error?.response?.data}`);
+      throw new Error(
+        `Visbook API request failed: ${error?.response?.data?.message}`,
+      );
     }
   }
 

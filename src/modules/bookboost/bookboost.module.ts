@@ -4,7 +4,11 @@ import { BookboostController } from './bookboost.controller';
 import { BookboostService } from './bookboost.service';
 
 @Module({
-  imports: [HttpModule],
+  imports: [
+    HttpModule.register({
+      withCredentials: true,
+    }),
+  ],
   controllers: [BookboostController],
   providers: [BookboostService],
   exports: [BookboostService],
