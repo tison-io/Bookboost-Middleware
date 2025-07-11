@@ -47,7 +47,6 @@ export class VisbookIntegrationService {
     let reservationId: string | null = null;
 
     try {
-      // Step 1: Create product reservations via /reservations endpoint
       this.logger.log('Creating reservation in Visbook...');
       const reservationResponse =
         await this.visbookService.createReservation(createReservationDto);
@@ -57,7 +56,6 @@ export class VisbookIntegrationService {
         throw new Error('Failed to get reservation ID from Visbook response');
       }
 
-      // Track reservation status and encrypted company ID
       this.reservations.set(reservationId, {
         status: 'created',
         encryptedCompanyId: reservationResponse.encryptedCompanyId,
@@ -67,10 +65,8 @@ export class VisbookIntegrationService {
       });
       this.logger.log(`Reservation created with ID: ${reservationId}`);
 
-      // Step 2: Schedule ping job for this specific reservation
       this.scheduleReservationPing(reservationId, webentity);
 
-      // Step 3: Request login code via /login endpoint
       this.logger.log('Requesting login code...');
       const loginBody = this.buildLoginBody(loginMethod, loginCredentials);
 
@@ -89,7 +85,6 @@ export class VisbookIntegrationService {
     } catch (error) {
       this.logger.error('Error in reservation and login initiation:', error);
 
-      // Update reservation status to failed
       if (reservationId) {
         const existingData = this.reservations.get(reservationId);
         this.reservations.set(reservationId, {
@@ -99,7 +94,6 @@ export class VisbookIntegrationService {
           lastPing: existingData?.lastPing || new Date(),
           status: 'failed',
         });
-        // Clean up scheduled ping
         this.unscheduleReservationPing(reservationId);
       }
 
@@ -122,7 +116,6 @@ export class VisbookIntegrationService {
     errorUrl: string = 'https://your-domain.com/error',
   ): Promise<void> {
     try {
-      // Get reservation details for checkout
       const reservationData = this.reservations.get(reservationId);
       if (!reservationData) {
         throw new Error(`Reservation ${reservationId} not found`);
@@ -134,7 +127,6 @@ export class VisbookIntegrationService {
         );
       }
 
-      // Validate the token to get authentication cookie
       this.logger.log('Validating authentication token...');
       const validationResponse = await this.visbookService.validate({
         webentity,
@@ -152,7 +144,6 @@ export class VisbookIntegrationService {
         'Guest validated successfully, authentication cookie received',
       );
 
-      // Complete the order via /checkout
       this.logger.log('Processing checkout with authentication cookie...');
       const checkoutResponse = await this.visbookService.checkoutReservation({
         webentity,
@@ -171,7 +162,6 @@ export class VisbookIntegrationService {
         externalReference: `visbook-${reservationId}`,
       });
 
-      // Check checkout status
       if (
         checkoutResponse.checkoutStatus ===
         VisbookCheckoutStatus.SOME_RESERVATIONS_EXPIRED
@@ -192,7 +182,6 @@ export class VisbookIntegrationService {
       });
       this.logger.log('Checkout completed successfully');
 
-      // Extract guest information and sync with Bookboost
       const guestData = this.extractGuestData(customerData, checkoutResponse);
 
       this.logger.log('Synchronizing guest profile with Bookboost...');
@@ -210,7 +199,6 @@ export class VisbookIntegrationService {
         external_id: guestData.visbookId,
       });
 
-      // Link external reference
       if (bookboostUser.id && guestData.visbookId) {
         await this.bookboostService.linkExternalRef(
           bookboostUser.id,
@@ -218,7 +206,6 @@ export class VisbookIntegrationService {
         );
       }
 
-      // Tag user for segmentation
       await this.bookboostService.tagUser(bookboostUser.id, [
         'visbook-guest',
         'recent-checkout',
@@ -226,7 +213,6 @@ export class VisbookIntegrationService {
 
       this.logger.log('Guest profile synchronized successfully');
 
-      // Clean up scheduled ping
       this.unscheduleReservationPing(reservationId);
     } catch (error) {
       this.logger.error('Error completing checkout with token:', error);
@@ -254,12 +240,10 @@ export class VisbookIntegrationService {
     const jobName = `ping-reservation-${reservationId}`;
 
     try {
-      // Create interval job that runs every 35 seconds
       const interval = setInterval(async () => {
         await this.pingSpecificReservation(reservationId, webentity);
       }, 35000);
 
-      // Add to scheduler registry for proper management
       this.schedulerRegistry.addInterval(jobName, interval);
 
       this.logger.debug(`Scheduled ping job for reservation ${reservationId}`);
@@ -320,7 +304,6 @@ export class VisbookIntegrationService {
 
       await this.visbookService.pingReservation(webentity);
 
-      // Update last ping time
       this.reservations.set(reservationId, {
         ...reservationData,
         lastPing: new Date(),
@@ -330,7 +313,6 @@ export class VisbookIntegrationService {
     } catch (error) {
       this.logger.error(`Failed to ping reservation ${reservationId}:`, error);
 
-      // Optionally mark reservation as failed after multiple ping failures
       const reservationData = this.reservations.get(reservationId);
       if (reservationData) {
         this.reservations.set(reservationId, {
@@ -575,34 +557,5 @@ export class VisbookIntegrationService {
       activeReservations,
       scheduledPingJobs,
     };
-  }
-
-  /**
-   * Combined method for backward compatibility
-   */
-  async customerRegistrationAndSynchronization(
-    webentity: number,
-    loginMethod: VisbookLoginMethod,
-    loginCredentials: {
-      email?: string;
-      phoneNumber?: string;
-      countryCode?: string;
-    },
-    createReservationDto: VisbookReservationDto,
-    customerData: VisbookUserDto,
-    paymentType: VisbookPaymentType = VisbookPaymentType.NO_ONLINE_PAYMENT,
-  ): Promise<{ reservationId: string; message: string }> {
-    const result = await this.initiateReservationAndLogin(
-      webentity,
-      loginMethod,
-      loginCredentials,
-      createReservationDto,
-    );
-
-    this.logger.warn(
-      'Manual intervention required: User must provide validation token to complete checkout',
-    );
-
-    return result;
   }
 }
