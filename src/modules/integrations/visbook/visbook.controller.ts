@@ -1,44 +1,73 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { VisbookIntegrationService } from './visbook.integration.service';
-import { VisbookLoginMethod, VisbookPaymentType } from './visbook.dto';
+import {
+  VisbookCompleteCheckoutDto,
+  VisbookInitiateReservationDto,
+  VisbookPaymentType,
+} from './visbook.dto';
 
+@ApiTags('VisBook Integration')
 @Controller('visbook')
 export class VisbookController {
   constructor(private readonly visbookService: VisbookIntegrationService) {}
 
   @Post('initiate-reservation')
+  @ApiOperation({
+    summary: 'Initiate reservation with login',
+    description:
+      'Creates a reservation and sends a login token via email or SMS',
+  })
+  @ApiBody({
+    type: VisbookInitiateReservationDto,
+    description: 'Reservation initiation data with login credentials',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation initiated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        success: {
+          type: 'boolean',
+          example: true,
+        },
+        data: {
+          type: 'object',
+          description: 'Reservation data',
+        },
+        message: {
+          type: 'string',
+          example:
+            'Reservation initiated successfully. Please check your email/SMS for validation code.',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid input data',
+    schema: {
+      type: 'object',
+      properties: {
+        success: {
+          type: 'boolean',
+          example: false,
+        },
+        error: {
+          type: 'string',
+          example: 'Invalid reservation data',
+        },
+        message: {
+          type: 'string',
+          example: 'Failed to initiate reservation',
+        },
+      },
+    },
+  })
   async testInitiateReservation(
     @Body()
-    createReservationDto: {
-      webentity: number;
-      loginMethod: VisbookLoginMethod;
-      loginCredentials: {
-        email?: string;
-        phoneNumber?: string;
-        countryCode?: string;
-      };
-      reservationData: {
-        webentity: number;
-        fromDate: string;
-        toDate: string;
-        priceId: string;
-        numberOfPeople: number;
-        notes?: string;
-        guestsNames?: string[];
-        guestsAges?: number[];
-        additionalServices?: {
-          id: string;
-          encryptedCompanyId: string;
-          count: number;
-        }[];
-        additionalMerchandises?: {
-          id: string;
-          encryptedCompanyId: string;
-          count: number;
-        }[];
-        webProductId: string;
-      };
-    },
+    createReservationDto: VisbookInitiateReservationDto,
   ) {
     const { webentity, loginMethod, loginCredentials, reservationData } =
       createReservationDto;
@@ -67,39 +96,58 @@ export class VisbookController {
   }
 
   @Post('complete-checkout')
+  @ApiOperation({
+    summary: 'Complete checkout with validation token',
+    description:
+      'Completes the checkout process using a validation token and synchronizes guest data with Bookboost',
+  })
+  @ApiBody({
+    type: VisbookCompleteCheckoutDto,
+    description:
+      'Checkout completion data with validation token and customer information',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Checkout completed successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        success: {
+          type: 'boolean',
+          example: true,
+        },
+        message: {
+          type: 'string',
+          example:
+            'Checkout completed and guest synchronized with Bookboost successfully',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid input data or validation token',
+    schema: {
+      type: 'object',
+      properties: {
+        success: {
+          type: 'boolean',
+          example: false,
+        },
+        error: {
+          type: 'string',
+          example: 'Invalid validation token',
+        },
+        message: {
+          type: 'string',
+          example: 'Failed to complete checkout',
+        },
+      },
+    },
+  })
   async testCompleteCheckout(
     @Body()
-    completeCheckoutDto: {
-      reservationId: string;
-      webentity: number;
-      validationToken: string;
-      loginMethod: VisbookLoginMethod;
-      customerData: {
-        company?: string;
-        city?: string;
-        country?: string;
-        firstName?: string;
-        lastName?: string;
-        address?: string;
-        email: string;
-        phone?: string;
-        zipCode?: string;
-        mobile?: string;
-        passportNumber?: string;
-        title?: string;
-        extra1?: string;
-        extra2?: string;
-        extra3?: string;
-        extra4?: string;
-        extra5?: string;
-        followupAccepted?: boolean;
-        organizationNumber?: string;
-      };
-      paymentType?: VisbookPaymentType;
-      amount?: number;
-      successUrl?: string;
-      errorUrl?: string;
-    },
+    completeCheckoutDto: VisbookCompleteCheckoutDto,
   ) {
     const {
       reservationId,
