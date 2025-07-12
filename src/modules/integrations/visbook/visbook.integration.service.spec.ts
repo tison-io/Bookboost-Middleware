@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VisbookIntegrationService } from './visbook.integration.service';
 import { VisbookService } from './visbook.service';
-import { BookboostService } from 'src/modules/bookboost/bookboost.service';
+import { BookboostService } from '../../bookboost/bookboost.service';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   VisbookLoginMethod,

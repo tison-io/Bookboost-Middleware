@@ -5,7 +5,7 @@ import { VisbookLoginMethod, VisbookPaymentType } from './visbook.dto';
 import { of, throwError } from 'rxjs';
 import { AxiosResponse } from 'axios';
 
-jest.mock('src/config/visbook.config', () => ({
+jest.mock('../../../config/visbook.config', () => ({
   visbookConfig: {
     BASE_URL: 'https://api.visbook.com',
     LINKS: {

@@ -157,8 +157,8 @@ export class VisbookController {
       customerData,
       paymentType = VisbookPaymentType.NO_ONLINE_PAYMENT,
       amount = 0,
-      successUrl = 'https://your-domain.com/success',
-      errorUrl = 'https://your-domain.com/error',
+      successUrl = 'https://bookboost.io/success',
+      errorUrl = 'https://bookboost.io/error',
     } = completeCheckoutDto;
 
     try {

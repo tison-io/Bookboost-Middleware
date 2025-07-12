@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
-import { BookboostController } from './bookboost.controller';
 import { BookboostService } from './bookboost.service';
 
 @Module({
@@ -9,7 +8,6 @@ import { BookboostService } from './bookboost.service';
       withCredentials: true,
     }),
   ],
-  controllers: [BookboostController],
   providers: [BookboostService],
   exports: [BookboostService],
 })
