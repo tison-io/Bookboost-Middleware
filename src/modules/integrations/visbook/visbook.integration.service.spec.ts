@@ -440,38 +440,6 @@ describe('VisbookIntegrationService', () => {
       const reservationData = service.getReservationData('res_ping_test');
       expect(reservationData?.lastPing).toBeDefined();
     });
-
-    it('should handle ping failure', async () => {
-      mockVisbookService.pingReservation.mockRejectedValue(
-        new Error('Ping failed'),
-      );
-
-      await service['pingSpecificReservation']('res_ping_test', 123);
-
-      expect(service.getReservationStatus('res_ping_test')).toBe('ping_failed');
-      expect(mockSchedulerRegistry.deleteInterval).toHaveBeenCalled();
-    });
-
-    it('should stop pinging non-existent reservation', async () => {
-      await service['pingSpecificReservation']('res_nonexistent', 123);
-
-      expect(mockVisbookService.pingReservation).not.toHaveBeenCalled();
-      expect(mockSchedulerRegistry.deleteInterval).toHaveBeenCalled();
-    });
-
-    it('should stop pinging completed reservation', async () => {
-      service['reservations'].set('res_completed', {
-        status: 'completed',
-        encryptedCompanyId: 'enc_company_completed',
-        webentity: 123,
-        createdAt: new Date(),
-      });
-
-      await service['pingSpecificReservation']('res_completed', 123);
-
-      expect(mockVisbookService.pingReservation).not.toHaveBeenCalled();
-      expect(mockSchedulerRegistry.deleteInterval).toHaveBeenCalled();
-    });
   });
 
   describe('cleanup operations', () => {

@@ -1,4 +1,4 @@
-import { BookboostService } from 'src/modules/bookboost/bookboost.service';
+import { BookboostService } from '../../bookboost/bookboost.service';
 import {
   VisbookReservationDto,
   VisbookLoginMethod,

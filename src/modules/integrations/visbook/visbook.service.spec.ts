@@ -83,7 +83,7 @@ describe('VisbookService', () => {
         method: 'POST',
         url: 'https://api.visbook.com/api/123/login/request/email',
         data: { email: 'test@example.com' },
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
 
@@ -113,7 +113,7 @@ describe('VisbookService', () => {
         method: 'POST',
         url: 'https://api.visbook.com/api/123/login/request/sms',
         data: { phoneNumber: '1234567890', countryCode: '1' },
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
 

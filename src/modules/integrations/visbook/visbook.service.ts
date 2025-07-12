@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { visbookConfig } from 'src/config/visbook.config';
+import { visbookConfig } from '../../../config/visbook.config';
 import {
   VisbookCheckoutDto,
   VisbookCheckoutResponseDto,
@@ -37,10 +37,23 @@ export class VisbookService {
       );
       return response.data;
     } catch (error) {
-      console.error(`Visbook API request failed: ${error?.response?.data}`);
-      throw new Error(
-        `Visbook API request failed: ${error?.response?.data?.message}`,
-      );
+      // Log the error response data first
+      console.error({ error: error?.response?.data });
+
+      // Extract error message from different error structures
+      let errorMessage = 'Unknown error';
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.response?.data) {
+        errorMessage = JSON.stringify(error.response.data);
+      }
+
+      // Log the final error message
+      console.error(`Visbook API request failed: ${errorMessage}`);
+
+      throw new Error(`Visbook API request failed: ${errorMessage}`);
     }
   }
 
